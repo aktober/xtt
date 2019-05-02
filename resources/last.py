@@ -15,30 +15,17 @@ class LastResource(Resource):
         number = args['number']
 
         last_ops = []
-        if not currency and not number:
-            op = models.Operations.query.order_by(-models.Operations.requested_time)\
-                .first()
-            if op:
-                last_ops.append(op.to_dict())
+        query = models.Operations.query.order_by(-models.Operations.requested_time)
 
-        elif not currency and number:
-            ops = models.Operations.query.order_by(-models.Operations.requested_time)\
-                .limit(number)
-            for op in ops:
-                last_ops.append(op.to_dict())
+        if currency:
+            query = query.filter_by(currency=currency)
 
-        elif currency and not number:
-            op = models.Operations.query.filter_by(currency=currency) \
-                .order_by(-models.Operations.requested_time) \
-                .first()
-            if op:
-                last_ops.append(op.to_dict())
-
+        if number:
+            query = query.limit(number)
+            last_ops = models.operations_schema.dump(query)
         else:
-            ops = models.Operations.query.filter_by(currency=currency) \
-                .order_by(-models.Operations.requested_time) \
-                .limit(number)
-            for op in ops:
-                last_ops.append(op.to_dict())
+            query = query.first()
+            el = models.operation_schema.dump(query)
+            last_ops.append(el)
 
         return jsonify({'operations': last_ops})

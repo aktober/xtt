@@ -2,12 +2,14 @@ from flask import Flask, render_template
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 
 from config import SQLALCHEMY_DATABASE_URI
 
 
 app = Flask(__name__, static_url_path='')
 api = Api(app)
+ma = Marshmallow(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
